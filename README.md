@@ -26,7 +26,16 @@ The remainder of the README is text that can be preserved in your plugin:
 ---
 
 
-## Development
+### Development
+
+Open the project
+
+```bash
+nvim -c "set rtp+=." -c "luafile dev/init.lua"
+```
+
+You should be able to run it using <kbd>\<leader></kbd> + <kbd>\<leader></kbd> + <kbd>w</kbd>
+
 
 ### Run tests
 
