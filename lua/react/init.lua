@@ -1,35 +1,66 @@
+---@diagnostic disable: undefined-global
 local core = require('react.core')
 local render = require('react.render')
 local uv = require("luv")
 
 local create_signal = core.create_signal
 
+local greet, set_greet = create_signal('Welcome')
 
-function A()
+local fname, set_fname = create_signal('Alison')
+local lname, _ = create_signal('Swift')
+
+function Greet()
+  print('render greet')
   return {
-    'hello', ' ', 'world',
-    '\n'
+    greet()
   }
 end
 
-local name, set_name = create_signal('Srinesh')
-
-function B()
+function Name()
+  print('render name')
   return {
-    'Hello', ' ', name()
+    fname(), ' ', lname()
+  }
+end
+
+function Root()
+  return {
+    Greet, ' ', Name
   }
 end
 
 local M = {}
 
-function M.run()
-  print('...........................')
-  local buffer = 454
+local buffer = nil
 
-  render(buffer, function()
-    return {
-      A, B
-    }
+function M.run()
+  if not buffer or vim.api.nvim_buf_is_valid(buffer) then
+    buffer = vim.api.nvim_create_buf(true, true)
+  end
+
+  local win = vim.api.nvim_open_win(buffer, true, {
+    relative = 'editor',
+    width = 50,
+    height = 30,
+    row = 15,
+    col = 100,
+  })
+
+  render(buffer, Root)
+
+  M.set_timeout(1000, function()
+    set_fname('Taylor')
+  end)
+
+  M.set_timeout(2000, function()
+    set_greet('Hello')
+  end)
+
+  M.set_timeout(3000, function()
+    vim.schedule(function()
+      vim.api.nvim_win_close(win, true)
+    end)
   end)
 end
 
