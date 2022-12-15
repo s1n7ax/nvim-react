@@ -1,33 +1,50 @@
 ---@diagnostic disable: undefined-global
 local core = require('react.core')
-local render = require('react.render')
+local render = require('react.render-new')
 local uv = require("luv")
 
 local create_signal = core.create_signal
 
-local greet, set_greet = create_signal('Welcome')
+local type, set_type = create_signal('SuperUser')
 
-local fname, set_fname = create_signal('Alison')
-local lname, _ = create_signal('Swift')
-
-function Greet()
-  print('render greet')
+function SuperUser()
+  print('render SuperUser')
   return {
-    greet()
+    'This is super user page'
   }
 end
 
-function Name()
-  print('render name')
+function User()
+  print('render User')
   return {
-    fname(), ' ', lname()
+    'This is user page'
+  }
+end
+
+function Admin()
+  print('render Admin')
+  return {
+    'This is admin page'
   }
 end
 
 function Root()
-  return {
-    Greet, ' ', Name
-  }
+  print('render Root')
+  if type() == 'Admin' then
+    return {
+      Admin
+    }
+  elseif type() == 'SuperUser' then
+    return {
+      'My website',
+      SuperUser,
+      ' testing'
+    }
+  else
+    return {
+      User
+    }
+  end
 end
 
 local M = {}
@@ -49,13 +66,13 @@ function M.run()
 
   render(buffer, Root)
 
-  M.set_timeout(1000, function()
-    set_fname('Taylor')
+  M.set_timeout(2000, function()
+    set_type('Admin')
   end)
 
-  M.set_timeout(2000, function()
-    set_greet('Hello')
-  end)
+  --  M.set_timeout(3000, function()
+    --  set_type('User')
+  --o end)
 
   M.set_timeout(3000, function()
     vim.schedule(function()
