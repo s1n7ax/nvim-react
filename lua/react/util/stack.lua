@@ -1,21 +1,24 @@
-return function()
-	local stack = {}
+local M = {}
 
-	local push = function(value)
-		table.insert(stack, value)
-	end
+function M:new()
+	local o = { stack = {} }
 
-	local pop = function()
-		table.remove(stack)
-	end
+	setmetatable(o, self)
+	self.__index = self
 
-	local pointer = function()
-		return stack[#stack]
-	end
-
-	return {
-		push = push,
-		pop = pop,
-		pointer = pointer,
-	}
+	return o
 end
+
+function M:push(value)
+	table.insert(self.stack, value)
+end
+
+function M:pop()
+	table.remove(self.stack)
+end
+
+function M:pointer()
+	return self.stack[#self.stack]
+end
+
+return M

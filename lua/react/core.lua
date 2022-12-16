@@ -1,33 +1,38 @@
 ---@diagnostic disable: undefined-global
 local Stack = require('react.util.stack')
-local Set = require('react.util.set')
+local Publisher = require('react.util.publisher')
 
-local context = Stack()
-
-local M = {}
+local M = {
+    effect_context = Stack:new()
+}
 
 function M.create_effect(callback)
     local execute
 
     execute = function()
-        context.push(execute)
+        M.effect_context:push(execute)
 
         callback()
 
-        context.pop()
+        M.effect_context:pop()
     end
 
     execute()
+
+    -- Returns the destruct function
+    return function ()
+
+    end
 end
 
 function M.create_signal(value)
-    local subscribers = Set()
+    local publisher = Publisher:new()
 
     local read = function()
-        local point = context.pointer()
+        local point = M.effect_context:pointer()
 
         if point then
-            subscribers.add(point)
+            publisher:add(point)
         end
 
         return value
@@ -36,9 +41,7 @@ function M.create_signal(value)
     local write = function(new_value)
         value = new_value
 
-        for _, subscriber in subscribers.iter() do
-            subscriber()
-        end
+        publisher:dispatch()
     end
 
     return read, write

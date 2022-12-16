@@ -109,13 +109,15 @@ function M:get_text()
     return self.text
 end
 
+-- Returns the range of text
 function M:get_text_range(text)
     local row_end = 0
     local after_last_newline_idx = 0
 
     for idx in text:gmatch "\n()" do
         row_end = row_end + 1
-        after_last_newline_idx = idx
+        -- idx is the next character after a new line
+        after_last_newline_idx = (idx - 1)
     end
 
     return {
@@ -124,7 +126,6 @@ function M:get_text_range(text)
         row_end = row_end,
         col_end = #text - after_last_newline_idx
     }
-
 end
 
 -- Calculates the given range (of a child) relative to the current component
@@ -157,11 +158,15 @@ function M:get_relative_clild_range(id, child_range)
     return new_range
 end
 
--- Dispatch an re-render update to parent node
+-- Dispatch a re-render update to parent node
 function M:__dispatch_update(range, text)
-    self.subscriber(range, text)
+    if self.subscriber then
+        self.subscriber(range, text)
+    end
 end
 
+-- Returns a function that has the context of the child that is notifying
+-- current component
 function M:__get_notify_callback(id)
     local this = self
 
@@ -174,6 +179,7 @@ function M:__get_notify_callback(id)
     end
 end
 
+-- Remove the subscriber from the component
 function M:remove_subscriber()
     self.subscriber = nil
 end
