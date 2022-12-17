@@ -29,8 +29,8 @@ function M:remove(index)
     return table.remove(self.list, index)
 end
 
-function M:remove_value(value)
-    local index = M.find_index(value)
+function M:remove_by_value(value)
+    local index = self:find_index(value)
 
     if index < 0 then
         return
@@ -39,6 +39,10 @@ function M:remove_value(value)
     table.remove(self.list, index)
 
     return index
+end
+
+function M:remove_all()
+    self.list = {}
 end
 
 function M:find_index(value)

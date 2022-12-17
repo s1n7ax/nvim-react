@@ -28,6 +28,7 @@ function M:new(args)
     local o = {
         node = args.component,
         subscriber = args.subscriber,
+        effect = nil,
         components = {},
         text = '',
     }
@@ -52,7 +53,7 @@ function M:new(args)
         end
     end
 
-    create_effect(function()
+    o.effect = create_effect(function()
         init()
     end)
 
@@ -97,11 +98,16 @@ function M:__release_components()
     for _, component in ipairs(self.components) do
         if type(component) == "table" then
             component:remove_subscriber()
+            component:release_effect()
         end
     end
 
     self.components = {}
     self.text = ''
+end
+
+function M:release_effect()
+    self.effect:unsubscribe_signals()
 end
 
 -- Returns the text of the current component
