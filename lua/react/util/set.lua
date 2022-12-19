@@ -77,4 +77,8 @@ function M:pop()
     table.remove(self.list)
 end
 
+function M:lenght()
+    return #self.list
+end
+
 return M
