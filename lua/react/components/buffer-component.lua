@@ -1,3 +1,4 @@
+local Set = require('react.util.set')
 local core = require('react.core')
 
 local create_effect = core.create_effect
@@ -7,9 +8,11 @@ local M = {}
 function M:new(args)
     assert(args.component, [[A component should be passed
         Ex:-
+        local message, set_message = create_signal('Hello World')
+
         local function App()
             return {
-                'Hello World'
+                message()
             }
         end
 
@@ -26,10 +29,22 @@ function M:new(args)
     ]])
 
     local o = {
+        -- User's functional
         node = args.component,
+
+        -- Callback to get on change events
         subscriber = args.subscriber,
+
+        -- Effect object which will wrap the user's functional component
+        -- We are keeping this to release the memory when detaching the
+        -- component from it's parent
         effect = nil,
-        components = {},
+
+        -- List of components that will be referred when one of them are
+        -- user functional components and it's being updated
+        components = Set:new(),
+
+        -- holds the latest text of this component
         text = '',
     }
 
@@ -39,7 +54,7 @@ function M:new(args)
     local init = nil
 
     -- Render the component for the first time without dispatching any changed
-    -- events for the first time
+    -- events
     init = function()
         o:__init_component()
 
@@ -48,7 +63,7 @@ function M:new(args)
 
             o:__init_component()
 
-            -- dispatch change event to parent
+            -- dispatches change event to parent
             o:__dispatch_update(o:get_text_range(prev_text), o.text)
         end
     end
@@ -60,52 +75,8 @@ function M:new(args)
     return o
 end
 
-function M:__init_component()
-    -- remove prev subscriptions to children and text
-    self:__release_components()
-
-    local nodes = self.node()
-
-    for index, node in ipairs(nodes) do
-        -- IF the current node is a function, then initialize component wrapper
-        -- around it and store the text
-        if type(node) == 'function' then
-            local component = M:new({
-                component = node,
-                -- __get_notify_callback returns a callback that notify the
-                -- parent of the current component with the updated range
-                -- relative to the current component
-                subscriber = self:__get_notify_callback(index)
-            })
-
-            table.insert(self.components, component)
-
-            self.text = self.text .. component:get_text()
-
-            -- IF the current node is a text, get the text as it is
-        elseif type(node) == 'string' then
-            table.insert(self.components, node)
-
-            self.text = self.text .. node
-        end
-    end
-end
-
--- Removes all subscriptions to children components and previous rendered text
-function M:__release_components()
-    if #self.components < 1 then return end
-
-    for _, component in ipairs(self.components) do
-        if type(component) == "table" then
-            component:remove_subscriber()
-            component:release_effect()
-        end
-    end
-
-    self.components = {}
-    self.text = ''
-end
-
+-- Removes the component's effect from signals so set signals will not trigger a
+-- re-render and released from the memory
 function M:release_effect()
     self.effect:unsubscribe_signals()
 end
@@ -139,7 +110,7 @@ function M:get_relative_clild_range(id, child_range)
     local text = ''
 
     for index = 1, (id - 1), 1 do
-        local component = self.components[index]
+        local component = self.components:get(index)
 
         if type(component) == 'string' then
             text = text .. component
@@ -164,6 +135,11 @@ function M:get_relative_clild_range(id, child_range)
     return new_range
 end
 
+-- Remove the subscriber from the component
+function M:remove_subscriber()
+    self.subscriber = nil
+end
+
 -- Dispatch a re-render update to parent node
 function M:__dispatch_update(range, text)
     if self.subscriber then
@@ -171,8 +147,8 @@ function M:__dispatch_update(range, text)
     end
 end
 
--- Returns a function that has the context of the child that is notifying
--- current component
+-- Returns a function that has the context of the child index that is notifying
+-- this component
 function M:__get_notify_callback(id)
     local this = self
 
@@ -185,9 +161,50 @@ function M:__get_notify_callback(id)
     end
 end
 
--- Remove the subscriber from the component
-function M:remove_subscriber()
-    self.subscriber = nil
+-- Removes all subscriptions to children components and previous rendered text
+function M:__release_components()
+    if self.components:lenght() < 1 then return end
+
+    for _, component in self.components:iter() do
+        if type(component) == "table" then
+            component:remove_subscriber()
+            component:release_effect()
+        end
+    end
+
+    self.components:remove_all()
+    self.text = ''
+end
+
+function M:__init_component()
+    -- remove prev subscriptions to children and text
+    self:__release_components()
+
+    local nodes = self.node()
+
+    for index, node in ipairs(nodes) do
+        -- IF the current node is a function, then initialize component wrapper
+        -- around it and store the text
+        if type(node) == 'function' then
+            local component = M:new({
+                component = node,
+                -- __get_notify_callback returns a callback that notify the
+                -- parent of the current component with the updated range
+                -- relative to the current component
+                subscriber = self:__get_notify_callback(index)
+            })
+
+            self.components:add(component)
+
+            self.text = self.text .. component:get_text()
+
+            -- IF the current node is a text, get the text as it is
+        elseif type(node) == 'string' then
+            self.components:add(node)
+
+            self.text = self.text .. node
+        end
+    end
 end
 
 return M
