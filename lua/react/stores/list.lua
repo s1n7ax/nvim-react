@@ -1,7 +1,5 @@
-local core = require('react.core')
 local Publisher = require('react.util.publisher')
-
-local Context = core.context
+local Effect = require('react.core.effect')
 
 local M = {
 	list = {},
@@ -15,17 +13,22 @@ function M:new(o)
 	return o
 end
 
-function M:push(value)
-	table.insert(self.list, value)
-	self.publisher:dispatch()
-end
-
 function M:get(index)
 	self:reg_subscriber()
 	return self.list[index]
 end
 
-function M:delete(index)
+function M:length()
+	self:reg_subscriber()
+	return #self.list
+end
+
+function M:add(value)
+	table.insert(self.list, value)
+	self.publisher:dispatch()
+end
+
+function M:remove(index)
 	table.remove(self.list, index)
 	self.publisher:dispatch()
 end
@@ -36,11 +39,16 @@ function M:iter()
 end
 
 function M:reg_subscriber()
-	local point = Context:pointer()
+	local effect = Effect.context:pointer()
 
-	if point then
-		self.publisher:add(point)
+	if effect then
+		effect:add_signal(self)
+		self.publisher:add(effect)
 	end
+end
+
+function M:remove_effect(effect)
+	self.publisher:remove_by_value(effect)
 end
 
 return M
