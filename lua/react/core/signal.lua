@@ -4,6 +4,12 @@ local Publisher = require('react.util.publisher')
 local M = {}
 
 function M:new(value)
+    -- creating signals or stores within an effect causes infinite loops
+    assert(
+        Effect.context:is_empty(),
+        "You should not create signals or stores within an effect or component"
+    )
+
     local o = {
         value = value,
         publisher = Publisher:new()

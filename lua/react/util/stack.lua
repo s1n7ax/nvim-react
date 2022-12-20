@@ -21,4 +21,8 @@ function M:pointer()
 	return self.stack[#self.stack]
 end
 
+function M:is_empty()
+	return #self.stack == 0
+end
+
 return M
