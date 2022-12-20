@@ -2,7 +2,7 @@ local Effect = require('react.core.effect')
 local Signal = require('react.core.signal')
 
 describe('effect::', function()
-    it('Throws when callback if not passed', function()
+    it('throws when callback if not passed', function()
         assert.has_error(function()
             Effect:new('hello')
         end)
@@ -16,7 +16,7 @@ describe('effect::', function()
         end, 'Callback function should be passed to effect')
     end)
 
-    it('Callback runs on dispatch', function()
+    it('callback runs on dispatch', function()
         local got_callback = false
 
         local effect = Effect:new(function()
@@ -28,7 +28,7 @@ describe('effect::', function()
         assert.equal(true, got_callback)
     end)
 
-    it('Adds signal to the effect on use', function()
+    it('adds signal to the effect on use', function()
         local signal1 = Signal:new()
         local signal2 = Signal:new()
 
@@ -44,7 +44,7 @@ describe('effect::', function()
         assert.equal(signal2, effect.signals:get(2))
     end)
 
-    it('Unsubscribes signals', function ()
+    it('unsubscribes signals', function ()
         local signal1 = Signal:new()
         local signal2 = Signal:new()
         local signal3 = Signal:new()

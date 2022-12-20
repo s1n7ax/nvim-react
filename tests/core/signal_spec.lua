@@ -2,7 +2,7 @@ local Effect = require('react.core.effect')
 local Signal = require('react.core.signal')
 
 describe('signal::', function()
-    it('Throws when initialized inside effect', function()
+    it('throws when initialized inside effect', function()
         local effect = Effect:new(function()
             assert.has_error(function()
                 Signal:new(0)
@@ -12,7 +12,7 @@ describe('signal::', function()
         effect:dispatch()
     end)
 
-    it('Readable & writeable outside of effects', function()
+    it('readable & writeable outside of effects', function()
         local signal = Signal:new(10)
 
         assert.equal(10, signal:read())
@@ -23,7 +23,7 @@ describe('signal::', function()
         assert.equal(0, signal.publisher:length())
     end)
 
-    it('Multiple signal reads in same effect should only register once', function()
+    it('multiple signal reads in same effect should only register once', function()
         local signal = Signal:new(10)
 
         local effect = Effect:new(function()
@@ -36,7 +36,7 @@ describe('signal::', function()
         assert.equal(1, signal.publisher:length())
     end)
 
-    it('After unsubscribe, effect should be removed from signal', function()
+    it('after unsubscribe, effect should be removed from signal', function()
         local signal1 = Signal:new(10)
         local signal2 = Signal:new(10)
 
