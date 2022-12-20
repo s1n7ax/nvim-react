@@ -11,24 +11,24 @@ describe('core::', function()
             local bool = create_signal(true)
             local tbl = create_signal({ name = 's1n7ax' })
 
-            assert.are.same(10, num())
-            assert.are.same('hello world', str())
-            assert.are.same(true, bool())
-            assert.are.same({ name = 's1n7ax' }, tbl())
+            assert.same(10, num())
+            assert.same('hello world', str())
+            assert.same(true, bool())
+            assert.same({ name = 's1n7ax' }, tbl())
         end)
 
         it('correctly changes the existing value', function()
             local signal, set_signal = create_signal(10)
-            assert.are.same(10, signal())
+            assert.same(10, signal())
 
             set_signal('hello world')
-            assert.are.same('hello world', signal())
+            assert.same('hello world', signal())
 
             set_signal(true)
-            assert.are.same(true, signal())
+            assert.same(true, signal())
 
             set_signal({ name = 's1n7ax' })
-            assert.are.same({ name = 's1n7ax' }, signal())
+            assert.same({ name = 's1n7ax' }, signal())
         end)
 
         it('signal change re-call effect', function()
@@ -39,16 +39,16 @@ describe('core::', function()
                 current_value = signal()
             end)
 
-            assert.are.same(10, current_value)
+            assert.same(10, current_value)
 
             set_signal('hello world')
-            assert.are.same('hello world', current_value)
+            assert.same('hello world', current_value)
 
             set_signal(true)
-            assert.are.same(true, current_value)
+            assert.same(true, current_value)
 
             set_signal({ name = 's1n7ax' })
-            assert.are.same({ name = 's1n7ax' }, current_value)
+            assert.same({ name = 's1n7ax' }, current_value)
         end)
 
         it('signal can not be created within an effect', function()
@@ -84,8 +84,8 @@ describe('core::', function()
 
             set_signal1('hello world')
 
-            assert.are.same(signal1_value, 'hello world')
-            assert.are.same(signal2_value, 10)
+            assert.same(signal1_value, 'hello world')
+            assert.same(signal2_value, 10)
         end)
 
         it('signal only triggers the effect that uses the signal when nested', function()
@@ -109,18 +109,37 @@ describe('core::', function()
                 end)
             end)
 
-            assert.are.same(10, curr_signal1)
-            assert.are.same(20, curr_signal2)
-            assert.are.same(30, curr_signal3)
+            assert.same(10, curr_signal1)
+            assert.same(20, curr_signal2)
+            assert.same(30, curr_signal3)
 
             set_signal3(signal3() + 1)
-            assert.are.same(31, curr_signal3)
+            assert.same(31, curr_signal3)
 
             set_signal2(signal2() + 1)
-            assert.are.same(21, curr_signal2)
+            assert.same(21, curr_signal2)
 
             set_signal1(signal1() + 1)
-            assert.are.same(11, curr_signal1)
+            assert.same(11, curr_signal1)
+        end)
+
+        it('signal can be unsubscribed', function()
+            local signal, set_signal = create_signal(10)
+
+            local signal_value = nil
+
+            local effect = create_effect(function()
+                signal_value = signal()
+            end)
+
+            assert.same(10, signal_value)
+
+            set_signal('hello')
+            assert.same('hello', signal_value)
+
+            effect:unsubscribe_signals()
+            set_signal('world')
+            assert.same('hello', signal_value)
         end)
     end)
 end)
