@@ -4,41 +4,41 @@ local Publisher = require('react.util.publisher')
 local M = {}
 
 function M:new(value)
-    -- creating signals or stores within an effect causes infinite loops
-    assert(
-        Effect.context:is_empty(),
-        "You should not create signals or stores within an effect or component"
-    )
+	-- creating signals or stores within an effect causes infinite loops
+	assert(
+		Effect.context:is_empty(),
+		'You should not create signals or stores within an effect or component'
+	)
 
-    local o = {
-        value = value,
-        publisher = Publisher:new()
-    }
+	local o = {
+		value = value,
+		publisher = Publisher:new(),
+	}
 
-    setmetatable(o, self)
-    self.__index = self
+	setmetatable(o, self)
+	self.__index = self
 
-    return o
+	return o
 end
 
 function M:read()
-    local effect = Effect.context:pointer()
+	local effect = Effect.context:pointer()
 
-    if effect then
-        effect:add_signal(self)
-        self.publisher:add(effect)
-    end
+	if effect then
+		effect:add_signal(self)
+		self.publisher:add(effect)
+	end
 
-    return self.value
+	return self.value
 end
 
 function M:write(value)
-    self.value = value
-    self.publisher:dispatch()
+	self.value = value
+	self.publisher:dispatch()
 end
 
 function M:remove_effect(effect)
-    self.publisher:remove_by_value(effect)
+	self.publisher:remove_by_value(effect)
 end
 
 return M

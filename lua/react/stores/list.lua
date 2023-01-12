@@ -1,9 +1,11 @@
+local Set = require('react.util.set')
 local Publisher = require('react.util.publisher')
 local Effect = require('react.core.effect')
 
 local M = {
-	list = {},
-	publisher = Publisher:new()
+	list = Set:new(),
+	element_publishers = Set:new(),
+	publisher = Publisher:new(),
 }
 
 function M:new(o)
@@ -15,27 +17,22 @@ end
 
 function M:get(index)
 	self:reg_subscriber()
-	return self.list[index]
-end
-
-function M:length()
-	self:reg_subscriber()
-	return #self.list
+	return self.list:get(index)
 end
 
 function M:add(value)
-	table.insert(self.list, value)
+	self.list:add(value)
 	self.publisher:dispatch()
 end
 
 function M:remove(index)
-	table.remove(self.list, index)
+	self.list:remove(index)
 	self.publisher:dispatch()
 end
 
 function M:iter()
 	self:reg_subscriber()
-	return ipairs(self.list)
+	return self.list:iter()
 end
 
 function M:reg_subscriber()
@@ -49,6 +46,11 @@ end
 
 function M:remove_effect(effect)
 	self.publisher:remove_by_value(effect)
+end
+
+function M:length()
+	self:reg_subscriber()
+	return self.list:length()
 end
 
 return M

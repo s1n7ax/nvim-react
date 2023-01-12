@@ -4,25 +4,25 @@ local Signal = require('react.core.signal')
 local M = {}
 
 function M.create_effect(callback)
-    local effect = Effect:new(callback)
+	local effect = Effect:new(callback)
 
-    effect:dispatch()
+	effect:dispatch()
 
-    return effect
+	return effect
 end
 
 function M.create_signal(value)
-    local signal = Signal:new(value)
+	local signal = Signal:new(value)
 
-    local read = function()
-        return signal:read()
-    end
+	local read = function()
+		return signal:read()
+	end
 
-    local write = function(new_value)
-        signal:write(new_value)
-    end
+	local write = function(new_value)
+		signal:write(new_value)
+	end
 
-    return read, write
+	return read, write
 end
 
 return M
