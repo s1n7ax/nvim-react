@@ -54,7 +54,7 @@ function M:new(args)
 	setmetatable(o, self)
 	self.__index = self
 
-	local init = nil
+	local init
 
 	-- Render the component for the first time without dispatching any changed
 	-- events
@@ -67,7 +67,7 @@ function M:new(args)
 			o:__init_component()
 
 			-- dispatches change event to parent
-			o:__dispatch_update(o:get_text_range(prev_text), o.text)
+			o:__dispatch_update(o.get_text_range(prev_text), o.text)
 		end
 	end
 
@@ -90,7 +90,7 @@ function M:get_text()
 end
 
 -- Returns the range of text
-function M:get_text_range(text)
+function M.get_text_range(text)
 	local row_end = 0
 	local after_last_newline_idx = 0
 
@@ -122,7 +122,7 @@ function M:get_relative_clild_range(id, child_range)
 		end
 	end
 
-	local range = self:get_text_range(text)
+	local range = self.get_text_range(text)
 
 	local new_range = {
 		row_start = range.row_end,

@@ -7,7 +7,7 @@ local create_signal = core.create_signal
 
 local time, set_time = create_signal(vim.split(os.date('%H-%M-%S'), '-'))
 
-function Root()
+local function Root()
 	local hour, min, sec = time()[1], time()[2], time()[3]
 
 	local hour_str = AsciiNum.get_number(hour)
