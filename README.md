@@ -19,6 +19,7 @@ Try following keymap
 ### Run tests
 
 | NOTE: Running tests requires [plenary.nvim][plenary] to be checked out in the parent directory of *this* repository |
+| --- |
 
 You can then run:
 
