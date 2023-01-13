@@ -67,6 +67,9 @@ function M.open_window()
 		row = 15,
 		col = 20,
 	})
+
+	vim.api.nvim_win_set_option(win, 'cursorline', false)
+	vim.api.nvim_win_set_option(win, 'cursorcolumn', false)
 end
 
 function M.close_window()
