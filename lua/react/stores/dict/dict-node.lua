@@ -5,6 +5,15 @@ local helper = require('react.stores.dict.helper')
 local M = {}
 
 function M:new(o)
+	--[[
+	-- @TODO https://github.com/s1n7ax/nvim-react/issues/2
+	--]]
+	assert(
+		Effect.context:is_empty(),
+		[[Creating signals or stores within an effect or component is not yet supported
+		https://github.com/s1n7ax/nvim-react/issues/2]]
+	)
+
 	assert(o.publishers, 'o.publishers should be passed')
 	assert(o.value, 'o.value should be passed')
 

@@ -4,10 +4,13 @@ local Publisher = require('react.util.publisher')
 local M = {}
 
 function M:new(value)
-	-- creating signals or stores within an effect causes infinite loops
+	--[[
+	-- @TODO https://github.com/s1n7ax/nvim-react/issues/2
+	--]]
 	assert(
 		Effect.context:is_empty(),
-		'You should not create signals or stores within an effect or component'
+		[[Creating signals or stores within an effect or component is not yet supported
+		https://github.com/s1n7ax/nvim-react/issues/2]]
 	)
 
 	local o = {
