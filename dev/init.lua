@@ -12,7 +12,7 @@ local package_name = 'react'
 --  end
 
 -- unload loaded modules by the matching text
-function Unload_packages()
+local function unload_packages()
 	for module_name, _ in pairs(package.loaded) do
 		if string.find(module_name, '^' .. package_name) then
 			package.loaded[module_name] = nil
@@ -27,13 +27,13 @@ local run_action = function()
 end
 
 -- unload and run the function from the package
-function Reload_and_run()
-	Unload_packages()
+local function reload_and_run()
+	unload_packages()
 	run_action()
 end
 
-local set_keymap = vim.api.nvim_set_keymap
+vim.keymap.set('n', '')
 
-set_keymap('n', '<leader><leader>r', '<cmd>luafile dev/init.lua<cr>', {})
-set_keymap('n', '<leader><leader>w', '<cmd>lua Reload_and_run()<cr>', {})
-set_keymap('n', '<leader><leader>u', '<cmd>lua Unload_packages()<cr>', {})
+vim.keymap.set('n', '<leader><leader>r', '<cmd>luafile dev/init.lua<cr>', {})
+vim.keymap.set('n', '<leader><leader>w', reload_and_run, {})
+vim.keymap.set('n', '<leader><leader>u', unload_packages, {})

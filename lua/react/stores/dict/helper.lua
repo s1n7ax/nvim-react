@@ -32,9 +32,9 @@ function M.dispatch_and_remove_children(root_pub_node)
 	local effects_to_dispatch = M.get_all_effects_in_pub_node(root_pub_node)
 
 	--[[
-  -- @TODO - right now, this function dose not remove the signal from the effect
-  -- signal should be stored and removed on this call
-  --]]
+	-- @TODO - right now, this function dose not remove the signal from the effect
+	-- signal should be stored and removed on this call
+	--]]
 
 	root_pub_node.children = {}
 

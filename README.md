@@ -2,9 +2,9 @@
 
 A reactive UI rendering framework for Neovim
 
-https://user-images.githubusercontent.com/18459807/212144062-28756d23-1c42-4171-9cd8-a49a866ac9e8.mp4
+<https://user-images.githubusercontent.com/18459807/212144062-28756d23-1c42-4171-9cd8-a49a866ac9e8.mp4>
 
-### Development
+## Development
 
 Open the project
 
@@ -12,27 +12,31 @@ Open the project
 nvim -c "luafile dev/init.lua"
 ```
 
-Try following keymap
-<kbd>\<leader></kbd> + <kbd>\<leader></kbd> + <kbd>w</kbd>
-
+Try `<leader><leader>w` keymap
 
 ### Run tests
 
-| NOTE: Running tests requires [plenary.nvim][plenary] to be checked out in the parent directory of *this* repository |
-| --- |
+:ledger: Running tests requires [plenary.nvim][plenary] to be checked out in the
+parent directory of _this_ repository
 
 You can then run:
 
 ```bash
-nvim --headless --noplugin -u tests/minimal.vim -c "PlenaryBustedDirectory tests/ {minimal_init = 'tests/minimal.vim'}"
+nvim \
+--headless \
+--noplugin \
+-u tests/minimal.vim \
+-c "PlenaryBustedDirectory tests/ {minimal_init = 'tests/minimal.vim'}"
 ```
 
 Or if you want to run a single test file:
 
 ```bash
-nvim --headless --noplugin -u tests/minimal.vim -c "PlenaryBustedDirectory tests/path_to_file.lua {minimal_init = 'tests/minimal.vim'}"
+nvim \
+--headless \
+--noplugin \
+-u tests/minimal.vim \
+-c "PlenaryBustedDirectory tests/path_to_file.lua {minimal_init = 'tests/minimal.vim'}"
 ```
 
-
-[nvim-lua-guide]: https://github.com/nanotee/nvim-lua-guide
 [plenary]: https://github.com/nvim-lua/plenary.nvim

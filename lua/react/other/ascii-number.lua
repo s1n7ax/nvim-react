@@ -1,4 +1,5 @@
 local M = {
+	-- editorconfig-checker-disable
 	[0] = [[
  :::::::
 :+:   :+:
@@ -89,6 +90,7 @@ local M = {
 #+#    #+#
  ########
 ]],
+	--  editorconfig-checker-enable
 }
 
 function M.get_number(num_str)
@@ -140,8 +142,8 @@ function M.get_number(num_str)
 		line_i = line_i + 1
 	end
 
+	---@diagnostic disable-next-line: unreachable-code
 	::continue::
-
 	return lines
 end
 
