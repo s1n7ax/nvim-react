@@ -1,15 +1,15 @@
 local M = {}
 
 function M.get_keys(map)
-  local keys = {}
+	local keys = {}
 
-  for key, _ in pairs(map) do
-    table.insert(keys, key)
-  end
+	for key, _ in pairs(map) do
+		table.insert(keys, key)
+	end
 
-  table.sort(keys)
+	table.sort(keys)
 
-  return keys
+	return keys
 end
 
 return M

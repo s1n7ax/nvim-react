@@ -9,26 +9,26 @@ function M:new(args)
 	assert(
 		args.component,
 		[[A component should be passed
-        Ex:-
-        local message, set_message = create_signal('Hello World')
+		Ex:-
+		local message, set_message = create_signal('Hello World')
 
-        local function App()
-            return {
-                message()
-            }
-        end
+		local function App()
+			return {
+				message()
+			}
+		end
 
-        local function on_change(changed_range, updated_content)
-            -- do something
-        end
+		local function on_change(changed_range, updated_content)
+			-- do something
+		end
 
-        local Component = require('react.component')
+		local Component = require('react.component')
 
-        Component:new({
-            component = App,
-            subscriber = on_change
-        })
-    ]]
+		Component:new({
+			component = App,
+			subscriber = on_change
+		})
+	]]
 	)
 
 	local o = {

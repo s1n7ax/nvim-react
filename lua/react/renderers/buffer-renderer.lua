@@ -10,14 +10,14 @@ function M:new(o)
 	assert(
 		o.buffer,
 		[[A buffer should be passed to the renderer
-        Ex:-
+		Ex:-
 
-        buffer = vim.api.nvim_create_buf(true, true)
+		buffer = vim.api.nvim_create_buf(true, true)
 
-        Renderer:new({
-            buffer = buffer
-        })
-    ]]
+		Renderer:new({
+			buffer = buffer
+		})
+	]]
 	)
 
 	setmetatable(o, self)
