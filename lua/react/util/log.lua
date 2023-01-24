@@ -40,8 +40,6 @@ local default_config = {
 -- {{{ NO NEED TO CHANGE
 local log = {}
 
-local unpack = unpack or table.unpack
-
 log.new = function(config, standalone)
 	config = vim.tbl_deep_extend('force', default_config, config)
 
@@ -51,12 +49,7 @@ log.new = function(config, standalone)
 		config.plugin
 	)
 
-	local obj
-	if standalone then
-		obj = log
-	else
-		obj = {}
-	end
+	local obj = standalone and log or {}
 
 	local levels = {}
 	for i, v in ipairs(config.modes) do
@@ -138,6 +131,11 @@ log.new = function(config, standalone)
 				lineinfo,
 				msg
 			)
+
+			if not fp then
+				return
+			end
+
 			fp:write(str)
 			fp:close()
 		end
