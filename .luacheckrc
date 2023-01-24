@@ -5,5 +5,6 @@ read_globals = {
   "vim",
   "describe",
   "it",
-  "assert"
+  "assert",
+  "before_each"
 }

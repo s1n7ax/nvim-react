@@ -1,0 +1,24 @@
+{
+	"$schema": "https://raw.githubusercontent.com/sumneko/vscode-lua/master/setting/schema.json",
+	"Lua.diagnostics.disable": [
+		"different-requires"
+	],
+	"Lua.diagnostics.globals": [
+		"vim",
+		"describe",
+		"it",
+		"assert",
+		"before_each"
+	],
+	"Lua.workspace": {
+		"checkThirdParty": false
+	},
+	"Lua.telemetry": {
+		"enable": false
+	},
+	"Lua.runtime.version": "LuaJIT",
+	"Lua.workspace.checkThirdParty": false,
+	"Lua.workspace.library": [
+		"${3rd}/OpenResty/library"
+	]
+}

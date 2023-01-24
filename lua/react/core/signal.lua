@@ -1,17 +1,21 @@
 local Effect = require('react.core.effect')
 local Publisher = require('react.util.publisher')
+local log = require('react.util.log')
 
 local M = {}
 
 function M:new(value)
-	--[[
-	-- @TODO https://github.com/s1n7ax/nvim-react/issues/2
-	--]]
-	assert(
-		Effect.context:is_empty(),
-		[[Creating signals or stores within an effect or component is not yet supported
-		https://github.com/s1n7ax/nvim-react/issues/2]]
-	)
+	local effect = Effect.context:pointer()
+
+	-- IF there is an effect and if next render it not first render of the effect then
+	-- the signals should be extracted from the effect without creating new
+	-- signals
+	if effect and not (effect:is_first_render()) then
+		log.debug('requesting existing signal from effect')
+		return effect:get_signal()
+	end
+
+	log.debug('creating signal with initial value:: ', value)
 
 	local o = {
 		value = value,
@@ -25,19 +29,33 @@ function M:new(value)
 end
 
 function M:read()
+	log.debug('reading signal value', self:get_value())
 	local effect = Effect.context:pointer()
 
-	if effect then
+	if effect and effect:is_first_render() then
+		log.debug('registering reader effect')
+		self:add_effect(effect)
 		effect:add_signal(self)
-		self.publisher:add(effect)
 	end
 
-	return self.value
+	return self:get_value()
 end
 
 function M:write(value)
-	self.value = value
+	self:set_value(value)
 	self.publisher:dispatch()
+end
+
+function M:get_value()
+	return self.value
+end
+
+function M:set_value(value)
+	self.value = value
+end
+
+function M:add_effect(effect)
+	self.publisher:add(effect)
 end
 
 function M:remove_effect(effect)
