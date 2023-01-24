@@ -1,5 +1,3 @@
-package.path = '../../../tests/?.lua;' .. package.path
-
 local Effect = require('react.core.effect')
 local Stack = require('react.util.stack')
 

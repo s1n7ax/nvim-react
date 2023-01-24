@@ -1,5 +1,4 @@
 local Effect = require('react.core.effect')
-local Stack = require('react.util.stack')
 
 local counter = require('tests.util.counter')
 local core = require('react.core')
