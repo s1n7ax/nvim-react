@@ -1,6 +1,6 @@
 # nvim-react (:construction: WIP)
 
-[ReactJS][reactjs] like reactive UI rendering framework for Neovim
+Reactive UI rendering framework for Neovim
 
 <https://user-images.githubusercontent.com/18459807/212144062-28756d23-1c42-4171-9cd8-a49a866ac9e8.mp4>
 
