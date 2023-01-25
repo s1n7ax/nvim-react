@@ -9,7 +9,7 @@
 - [x] Functional components
 - [x] Signals (something like `useState` in [ReactJS][reactjs])
 - [ ] Complex data stores (:construction: WIP)
-- [ ] Life cycle callbacks
+- [ ] Lifecycle callbacks
 - [ ] Keymap events
 
 ## Development
