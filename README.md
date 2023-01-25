@@ -11,6 +11,7 @@ Reactive UI rendering framework for Neovim
 - [ ] Complex data stores (:construction: WIP)
 - [ ] Lifecycle callbacks
 - [ ] Keymap events
+- [ ] Highlighting
 
 ## Development
 
