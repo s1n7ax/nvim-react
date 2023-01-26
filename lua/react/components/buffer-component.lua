@@ -2,6 +2,15 @@ local Set = require('react.util.set')
 local core = require('react.core')
 
 local create_effect = core.create_effect
+--- @alias Range { row_start: number, col_start: number, row_end: number, col_end: number }
+
+--- @class BufferComponent
+---
+--- @field private effect Effect
+--- @field private node function
+--- @field private subscriber function
+--- @field private components Set
+--- @field private text string
 
 local M = {}
 
@@ -78,18 +87,21 @@ function M:new(args)
 	return o
 end
 
--- Removes the component's effect from signals so set signals will not trigger a
--- re-render and released from the memory
+--- Removes the component's effect from signals so set signals will not trigger a
+--- re-render and released from the memory
 function M:release_effect()
 	self.effect:unsubscribe_signals()
 end
 
--- Returns the text of the current component
+--- Returns the text of the current component
+--- @returns string
 function M:get_text()
 	return self.text
 end
 
--- Returns the range of text
+--- Returns the range of text
+--- @param text string
+--- @returns Range
 function M.get_text_range(text)
 	local row_end = 0
 	local after_last_newline_idx = 0
@@ -108,7 +120,9 @@ function M.get_text_range(text)
 	}
 end
 
--- Calculates the given range (of a child) relative to the current component
+--- Calculates the given range (of a child) relative to the current component
+--- @param id number index of the child in the children list
+--- @param child_range Range
 function M:get_relative_clild_range(id, child_range)
 	local text = ''
 
@@ -138,20 +152,26 @@ function M:get_relative_clild_range(id, child_range)
 	return new_range
 end
 
--- Remove the subscriber from the component
+--- Remove the subscriber from the component
 function M:remove_subscriber()
 	self.subscriber = nil
 end
 
--- Dispatch a re-render update to parent node
+--- @private
+--- Dispatch a re-render update to parent node
+--- @param range Range range of the current component
+--- @param text string  text of the current component
 function M:__dispatch_update(range, text)
 	if self.subscriber then
 		self.subscriber(range, text)
 	end
 end
 
--- Returns a function that has the context of the child index that is notifying
--- this component
+--- @private
+--- Returned function will be used by children of this components to send change
+--- notifications back to this component.
+--- @param id number index of the child who is going to call this function on
+--- change
 function M:__get_notify_callback(id)
 	local this = self
 
@@ -164,7 +184,7 @@ function M:__get_notify_callback(id)
 	end
 end
 
--- Removes all subscriptions to children components and previous rendered text
+--- Removes all subscriptions to children components and previous rendered text
 function M:__release_components()
 	if self.components:length() < 1 then
 		return

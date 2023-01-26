@@ -1,7 +1,11 @@
 local Set = require('react.util.set')
 
+--- @module 'dict_helper'
 local M = {}
 
+--- Traverse through the table and find
+--- @param publisher_map PublisherMap
+--- @param path List
 function M.publisher_path_traversal(publisher_map, path)
 	local curr_pub_node = publisher_map
 

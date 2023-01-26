@@ -1,3 +1,4 @@
+--- @enum EffectEvents
 return {
 
 	-- runs before / after each render
