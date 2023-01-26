@@ -1,8 +1,12 @@
 local Effect = require('react.core.effect')
 local Signal = require('react.core.signal')
 
+--- @module 'core'
 local M = {}
 
+--- Creates a new effect
+--- @param callback function
+--- @returns Effect
 function M.create_effect(callback)
 	local effect = Effect:new(callback)
 
@@ -11,6 +15,9 @@ function M.create_effect(callback)
 	return effect
 end
 
+--- Creates a new signal
+--- @param value any initial value of the signal
+--- @returns function, function
 function M.create_signal(value)
 	local signal = Signal:new(value)
 

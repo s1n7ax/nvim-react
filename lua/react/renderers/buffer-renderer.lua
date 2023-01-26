@@ -1,5 +1,7 @@
 local Component = require('react.components.buffer-component')
 
+--- @class BufferRenderer
+--- @field buffer number id of the buffer BufferRenderer should manage
 local M = {}
 
 function M:new(o)
@@ -26,6 +28,8 @@ function M:new(o)
 	return o
 end
 
+--- Render the given root component
+--- @param root function root functional component to render
 function M:render(root)
 	local function on_change(range, text)
 		vim.schedule(function()
@@ -47,6 +51,10 @@ function M:render(root)
 	vim.api.nvim_buf_set_lines(self.buffer, 0, -1, true, lines)
 end
 
+--- @private
+--- Returns the split text by newlines
+--- @param text string text to split
+--- @returns string[]
 function M.__split_lines(text)
 	return vim.split(text, '\n')
 end

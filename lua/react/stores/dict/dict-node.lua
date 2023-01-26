@@ -2,16 +2,14 @@ local Effect = require('react.core.effect')
 local List = require('react.util.list')
 local helper = require('react.stores.dict.helper')
 
+--- @alias PublisherMap { key: string, effects: Set, children: PublisherMap[] }
+--- @class DictNode
 local M = {}
 
 function M:new(o)
-	--[[
-	-- @TODO https://github.com/s1n7ax/nvim-react/issues/2
-	--]]
 	assert(
 		Effect.context:is_empty(),
-		[[Creating signals or stores within an effect or component is not yet supported
-		https://github.com/s1n7ax/nvim-react/issues/2]]
+		'Store can not be created inside an effect or component'
 	)
 
 	assert(o.publishers, 'o.publishers should be passed')
