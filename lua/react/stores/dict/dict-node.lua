@@ -1,25 +1,27 @@
 local Effect = require('react.core.effect')
 local List = require('react.util.list')
 local helper = require('react.stores.dict.helper')
+local log = require('react.util.log')
 
 --- @alias PublisherMap { key: string, effects: Set, children: PublisherMap[] }
+--- @alias DictNodeConstructor { publishers: PublisherMap, value: any, path?: List, curr_publisher_node?: PublisherMap }
+
 --- @class DictNode
+--- @field value any value of the dict node
 local M = {}
 
-function M:new(o)
-	assert(
-		Effect.context:is_empty(),
-		'Store can not be created inside an effect or component'
-	)
+--- @param opt DictNodeConstructor
+function M:new(opt)
+	log.debug('creating dict node with value', opt.value)
 
-	assert(o.publishers, 'o.publishers should be passed')
-	assert(o.value, 'o.value should be passed')
+	assert(opt.publishers, 'o.publishers should be passed')
+	assert(opt.value, 'o.value should be passed')
 
 	local obj = setmetatable({}, {
-		publishers = o.publishers,
-		value = o.value,
-		path = o.path or List:new(),
-		curr_publishers_node = o.curr_publisher_node or o.publishers,
+		publishers = opt.publishers,
+		value = opt.value,
+		path = opt.path or List:new(),
+		curr_publishers_node = opt.curr_publisher_node or opt.publishers,
 
 		__index = self.index,
 		__newindex = self.newindex,
@@ -30,7 +32,7 @@ end
 
 function M.index(self, key)
 	local metatable = getmetatable(self)
-
+	log.debug(('indexing key "%s"'):format(key), 'of ', metatable.value)
 	-- meta table info
 	local publishers = metatable.publishers
 	local value = metatable.value
@@ -39,6 +41,9 @@ function M.index(self, key)
 	local curr_path = helper.get_curr_path_by_key(parent_path, key)
 	local curr_pub_node = helper.publisher_path_traversal(publishers, curr_path)
 	local indexed_value = value[key]
+
+
+	log.debug(('indexed value for key "%s" is'):format(key), indexed_value)
 
 	-- if there is an effect, add effect to store, and store to effect
 	local effect = Effect.context:pointer()
@@ -62,6 +67,8 @@ function M.index(self, key)
 
 	-- if the next value is a table then create new object of dict
 	if type(indexed_value) == 'table' then
+		log.debug('creating new dict node for path ', curr_path.list, ' with value', indexed_value)
+
 		return M:new({
 			publishers = publishers,
 			value = indexed_value,
@@ -70,12 +77,14 @@ function M.index(self, key)
 		})
 	end
 
-	return value
+	return indexed_value
 end
 
 function M.newindex(self, key, new_value)
+	log.debug(('creating new key "%s"'):format(key))
 	local metatable = getmetatable(self)
 	local value = metatable.value
+	log.debug(('creating new key "%s"'):format(key), 'in', value)
 
 	-- meta table info
 	local curr_pub_node = metatable.curr_publishers_node
