@@ -149,4 +149,16 @@ describe('effect::', function()
 		effect:unsubscribe_signals()
 		assert.equal(0, effect.signals:length())
 	end)
+
+	it('effect is removed from the context if there is an error while running effect', function()
+		pcall(function()
+			assert.equal(true, Effect.context:is_empty())
+
+			Effect:new(function()
+				error('throwing an error')
+			end):dispatch()
+		end)
+
+		assert.equal(true, Effect.context:is_empty())
+	end)
 end)
