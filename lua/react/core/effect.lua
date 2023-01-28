@@ -33,8 +33,14 @@ function M:new(callback)
 		o.events:dispatch(EffectEvents.BEFORE_RENDER)
 
 		M.context:push(o)
-		callback()
+
+		local ok, error_message = pcall(callback)
+
 		M.context:pop(o)
+
+		if not ok then
+			error(error_message)
+		end
 
 		o.events:dispatch(EffectEvents.AFTER_RENDER)
 	end
