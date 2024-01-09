@@ -1,6 +1,6 @@
 local core = require('react.core')
 local create_dict = require('react.stores.dict')
-local counter = require('tests.util.counter')
+local counter = require('util.counter')
 
 local create_effect = core.create_effect
 
@@ -14,13 +14,13 @@ describe('stores::', function()
 					basic_info = {
 						name = 's1n7ax',
 						age = 30,
-						address = 'Colombo, Sri Lanka'
+						address = 'Colombo, Sri Lanka',
 					},
 					employee_info = {
 						id = '0000000001',
-						designation = 'Full Stack Developer'
-					}
-				}
+						designation = 'Full Stack Developer',
+					},
+				},
 			}
 		end)
 
@@ -45,10 +45,7 @@ describe('stores::', function()
 		it('path traversal should return the correct value', function()
 			local store = create_dict(init_value)
 
-			assert.equal(
-				init_value.user_info,
-				getmetatable(store.user_info).value
-			)
+			assert.equal(init_value.user_info, getmetatable(store.user_info).value)
 			assert.equal(
 				init_value.user_info.basic_info,
 				getmetatable(store.user_info.basic_info).value
@@ -89,7 +86,10 @@ describe('stores::', function()
 			end)
 
 			assert.equal(1, get_count())
-			assert.equal(init_value.user_info.basic_info, getmetatable(curr_basic_info).value)
+			assert.equal(
+				init_value.user_info.basic_info,
+				getmetatable(curr_basic_info).value
+			)
 
 			store.user_info.basic_info = 'changed'
 			assert.equal(2, get_count())

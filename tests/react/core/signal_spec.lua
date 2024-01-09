@@ -1,7 +1,7 @@
 local Effect = require('react.core.effect')
 local Signal = require('react.core.signal')
 
-local counter = require('tests.util.counter')
+local counter = require('util.counter')
 
 describe('signal::', function()
 	it('correctly sets initial value', function()
@@ -79,25 +79,28 @@ describe('signal::', function()
 		end):dispatch()
 	end)
 
-	it('effect is registered only once when same signal is used multiple times', function()
-		Effect:new(function()
+	it(
+		'effect is registered only once when same signal is used multiple times',
+		function()
+			Effect:new(function()
+				local signal = Signal:new(10)
+
+				signal:read()
+				signal:read()
+				signal:read()
+
+				assert.equal(1, signal.publisher:length())
+			end):dispatch()
+
 			local signal = Signal:new(10)
-
-			signal:read()
-			signal:read()
-			signal:read()
-
+			Effect:new(function()
+				signal:read()
+				signal:read()
+				signal:read()
+			end):dispatch()
 			assert.equal(1, signal.publisher:length())
-		end):dispatch()
-
-		local signal = Signal:new(10)
-		Effect:new(function()
-			signal:read()
-			signal:read()
-			signal:read()
-		end):dispatch()
-		assert.equal(1, signal.publisher:length())
-	end)
+		end
+	)
 
 	it('re-render the effect on write', function()
 		local count, get_count = counter()
@@ -144,29 +147,27 @@ describe('signal::', function()
 		assert.equal(0, signal.publisher:length())
 	end)
 
-	it('signal returns the initially created signal on re-render',
-		function()
-			local signal_1, signal_2, signal_3
+	it('signal returns the initially created signal on re-render', function()
+		local signal_1, signal_2, signal_3
 
-			Effect:new(function()
-				signal_1 = Signal:new(10)
-				signal_2 = Signal:new(20)
-				signal_3 = Signal:new(30)
-			end):dispatch()
+		Effect:new(function()
+			signal_1 = Signal:new(10)
+			signal_2 = Signal:new(20)
+			signal_3 = Signal:new(30)
+		end):dispatch()
 
-			assert.same(10, signal_1:get_value())
-			assert.same(20, signal_2:get_value())
-			assert.same(30, signal_3:get_value())
+		assert.same(10, signal_1:get_value())
+		assert.same(20, signal_2:get_value())
+		assert.same(30, signal_3:get_value())
 
-			signal_1:write(signal_1:get_value() + 1)
-			signal_2:write(signal_2:get_value() + 1)
-			signal_3:write(signal_3:get_value() + 1)
+		signal_1:write(signal_1:get_value() + 1)
+		signal_2:write(signal_2:get_value() + 1)
+		signal_3:write(signal_3:get_value() + 1)
 
-			assert.same(11, signal_1:get_value())
-			assert.same(21, signal_2:get_value())
-			assert.same(31, signal_3:get_value())
-		end
-	)
+		assert.same(11, signal_1:get_value())
+		assert.same(21, signal_2:get_value())
+		assert.same(31, signal_3:get_value())
+	end)
 
 	it('after unsubscribe, effect should be removed from signal', function()
 		local signal_1 = Signal:new(10)

@@ -1,6 +1,6 @@
 local Effect = require('react.core.effect')
 
-local counter = require('tests.util.counter')
+local counter = require('util.counter')
 local core = require('react.core')
 
 local create_signal = core.create_signal

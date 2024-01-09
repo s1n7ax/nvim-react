@@ -2,7 +2,7 @@ local Effect = require('react.core.effect')
 local Stack = require('react.util.stack')
 
 local core = require('react.core')
-local counter = require('tests.util.counter')
+local counter = require('util.counter')
 local errors = require('react.core.effect-error-messages')
 
 local create_signal = core.create_signal
@@ -75,7 +75,6 @@ describe('effect::', function()
 			local _ = signal()
 			assert.equal(expected_first_time, effect.first_render)
 		end)
-
 
 		effect:dispatch()
 
@@ -150,15 +149,18 @@ describe('effect::', function()
 		assert.equal(0, effect.signals:length())
 	end)
 
-	it('effect is removed from the context if there is an error while running effect', function()
-		pcall(function()
+	it(
+		'effect is removed from the context if there is an error while running effect',
+		function()
+			pcall(function()
+				assert.equal(true, Effect.context:is_empty())
+
+				Effect:new(function()
+					error('throwing an error')
+				end):dispatch()
+			end)
+
 			assert.equal(true, Effect.context:is_empty())
-
-			Effect:new(function()
-				error('throwing an error')
-			end):dispatch()
-		end)
-
-		assert.equal(true, Effect.context:is_empty())
-	end)
+		end
+	)
 end)

@@ -27,32 +27,12 @@ require('lazy').setup({
 		'nvim-lua/plenary.nvim',
 		lazy = false,
 	},
-	{
-		'nvim-java/nvim-java-test',
-		---@diagnostic disable-next-line: assign-type-mismatch
-		dir = local_plug('~/Workspace/nvim-java-test'),
-		lazy = false,
-	},
-	{
-		'nvim-java/nvim-java-core',
-		---@diagnostic disable-next-line: assign-type-mismatch
-		dir = local_plug('~/Workspace/nvim-java-core'),
-		lazy = false,
-	},
-	{
-		'nvim-java/nvim-java-dap',
-		---@diagnostic disable-next-line: assign-type-mismatch
-		dir = local_plug('~/Workspace/nvim-java-dap'),
-		lazy = false,
-	},
-	{
-		'neovim/nvim-lspconfig',
-		lazy = false,
-	},
-	{
-		'williamboman/mason.nvim',
-		lazy = false,
-	},
+	-- {
+	-- 	'nvim-java/nvim-java-test',
+	-- 	---@diagnostic disable-next-line: assign-type-mismatch
+	-- 	dir = local_plug('~/Workspace/nvim-java-test'),
+	-- 	lazy = false,
+	-- },
 }, {
 	root = temp_path,
 	lockfile = temp_path .. '/lazy-lock.json',

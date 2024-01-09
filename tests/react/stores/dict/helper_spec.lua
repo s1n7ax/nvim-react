@@ -4,16 +4,30 @@ local helper = require('react.stores.dict.helper')
 local List = require('react.util.list')
 local Set = require('react.util.set')
 local Effect = require('react.core.effect')
-local utils = require('tests.util.map')
-
+local utils = require('util.map')
 
 describe('store::', function()
 	describe('dict::', function()
 		local get_init_pub_map = function()
-			return { key = 'root', effects = Set:new(),
-				children = { a = { key = 'a', effects = Set:new(),
-					children = { b = { key = 'b', effects = Set:new(),
-						children = { c = { key = 'c', effects = Set:new(), children = {} } } } } } } }
+			return {
+				key = 'root',
+				effects = Set:new(),
+				children = {
+					a = {
+						key = 'a',
+						effects = Set:new(),
+						children = {
+							b = {
+								key = 'b',
+								effects = Set:new(),
+								children = {
+									c = { key = 'c', effects = Set:new(), children = {} },
+								},
+							},
+						},
+					},
+				},
+			}
 		end
 
 		local pub_map = nil
@@ -53,7 +67,10 @@ describe('store::', function()
 				helper.publisher_path_traversal(pub_map, List:new({ 'a', 'b', 'c' }))
 
 				for _, key in ipairs({ 'a', 'b', 'c' }) do
-					assert.same({ 'children', 'effects', 'key' }, utils.get_keys(curr_pub_node))
+					assert.same(
+						{ 'children', 'effects', 'key' },
+						utils.get_keys(curr_pub_node)
+					)
 					assert.same({ key }, utils.get_keys(curr_pub_node.children))
 					assert.equal(curr_pub_node.effects:length(), 0)
 
@@ -64,8 +81,14 @@ describe('store::', function()
 			it('current path appends key to parent path', function()
 				local parent_path = List:new({ 'a', 'b', 'c' })
 
-				assert.same(List:new({ 'a', 'b', 'c', 'd' }), helper.get_curr_path_by_key(parent_path, 'd'))
-				assert.not_equal(List:new({ 'a', 'b', 'c', 'd' }), helper.get_curr_path_by_key(parent_path, 'd'))
+				assert.same(
+					List:new({ 'a', 'b', 'c', 'd' }),
+					helper.get_curr_path_by_key(parent_path, 'd')
+				)
+				assert.not_equal(
+					List:new({ 'a', 'b', 'c', 'd' }),
+					helper.get_curr_path_by_key(parent_path, 'd')
+				)
 			end)
 
 			it('on store change, removes relevant children nodes', function()
@@ -84,7 +107,10 @@ describe('store::', function()
 				-- 3rd level
 				pub_map = get_init_pub_map()
 
-				assert.same({ 'c' }, utils.get_keys(pub_map.children.a.children.b.children))
+				assert.same(
+					{ 'c' },
+					utils.get_keys(pub_map.children.a.children.b.children)
+				)
 				helper.dispatch_and_remove_children(pub_map.children.a.children.b)
 				assert.same({}, utils.get_keys(pub_map.children.a.children.b.children))
 			end)
@@ -113,7 +139,9 @@ describe('store::', function()
 				assert.same({ 0, 0, 0 }, effect_values)
 
 				effect_values = init_data_set()
-				helper.dispatch_and_remove_children(pub_map.children.a.children.b.children.c)
+				helper.dispatch_and_remove_children(
+					pub_map.children.a.children.b.children.c
+				)
 				assert.same({ 0, 0, 1 }, effect_values)
 
 				effect_values = init_data_set()
@@ -125,34 +153,39 @@ describe('store::', function()
 				assert.same({ 1, 1, 1 }, effect_values)
 			end)
 
-			it('on store change, store does not dispatch previously removed effects', function()
-				local init_data_set = function()
-					pub_map = get_init_pub_map()
+			it(
+				'on store change, store does not dispatch previously removed effects',
+				function()
+					local init_data_set = function()
+						pub_map = get_init_pub_map()
 
-					local effects = {}
-					local effect_values = { 0, 0, 0 }
+						local effects = {}
+						local effect_values = { 0, 0, 0 }
 
-					for i = 1, 3 do
-						effects[i] = Effect:new(function()
-							effect_values[i] = effect_values[i] + 1
-						end)
+						for i = 1, 3 do
+							effects[i] = Effect:new(function()
+								effect_values[i] = effect_values[i] + 1
+							end)
+						end
+
+						pub_map.children.a.effects:add(effects[1])
+						pub_map.children.a.children.b.effects:add(effects[2])
+						pub_map.children.a.children.b.children.c.effects:add(effects[3])
+
+						return effect_values
 					end
 
-					pub_map.children.a.effects:add(effects[1])
-					pub_map.children.a.children.b.effects:add(effects[2])
-					pub_map.children.a.children.b.children.c.effects:add(effects[3])
+					local effect_values = init_data_set()
 
-					return effect_values
+					helper.dispatch_and_remove_children(
+						pub_map.children.a.children.b.children.c
+					)
+					helper.dispatch_and_remove_children(pub_map.children.a.children.b)
+					helper.dispatch_and_remove_children(pub_map.children.a)
+
+					assert.same({ 1, 2, 2 }, effect_values)
 				end
-
-				local effect_values = init_data_set()
-
-				helper.dispatch_and_remove_children(pub_map.children.a.children.b.children.c)
-				helper.dispatch_and_remove_children(pub_map.children.a.children.b)
-				helper.dispatch_and_remove_children(pub_map.children.a)
-
-				assert.same({ 1, 2, 2 }, effect_values)
-			end)
+			)
 		end)
 	end)
 end)
