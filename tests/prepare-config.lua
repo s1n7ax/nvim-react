@@ -1,12 +1,3 @@
-local lazypath = vim.fn.stdpath('data') .. '/lazy/lazy.nvim'
-
----@diagnostic disable: assign-type-mismatch
----@param path string
----@return string|nil
-local function local_plug(path)
-	return vim.fn.isdirectory(path) == 1 and path or nil
-end
-
 if not vim.loop.fs_stat(lazypath) then
 	vim.fn.system({
 		'git',
