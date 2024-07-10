@@ -8,7 +8,7 @@ local M = {}
 --- @param callback function
 --- @returns Effect
 function M.create_effect(callback)
-	local effect = Effect:new(callback)
+	local effect = Effect(callback)
 
 	effect:dispatch()
 
@@ -19,7 +19,7 @@ end
 --- @param value any initial value of the signal
 --- @returns function, function
 function M.create_signal(value)
-	local signal = Signal:new(value)
+	local signal = Signal(value)
 
 	local read = function()
 		return signal:read()

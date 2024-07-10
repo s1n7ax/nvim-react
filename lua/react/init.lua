@@ -19,12 +19,7 @@ local function Root()
 	for i = 1, #hour_str do
 		table.insert(
 			text,
-			string.format(
-				'%s  |  %s  |  %s\n',
-				hour_str[i],
-				min_str[i],
-				sec_str[i]
-			)
+			string.format('%s  |  %s  |  %s\n', hour_str[i], min_str[i], sec_str[i])
 		)
 	end
 
@@ -48,11 +43,9 @@ function M.run()
 		on_stop = M.close_window,
 	})
 
-	Render
-		:new({
-			buffer = buffer,
-		})
-		:render(Root)
+	Render({
+		buffer = buffer,
+	}):render(Root)
 end
 
 function M.open_window()

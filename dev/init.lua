@@ -33,5 +33,5 @@ local function reload_and_run()
 end
 
 vim.keymap.set('n', '<leader><leader>r', '<cmd>luafile dev/init.lua<cr>', {})
-vim.keymap.set('n', '<leader><leader>w', reload_and_run, {})
+vim.keymap.set('n', '<leader><leader>s', reload_and_run, {})
 vim.keymap.set('n', '<leader><leader>u', unload_packages, {})

@@ -1,13 +1,14 @@
+local class = require('react.util.class')
 local Effect = require('react.core.effect')
 local Publisher = require('react.util.publisher')
 local log = require('react.util.log')
 
---- @class Signal
+--- @class react.Signal
 --- @field private value table value of the store
 --- @field private publisher Publisher
-local M = {}
+local Signal = class()
 
-function M:new(value)
+function Signal:_init(value)
 	local effect = Effect.context:pointer()
 
 	-- IF there is an effect and if next render it not first render of the effect then
@@ -20,15 +21,8 @@ function M:new(value)
 
 	log.debug('creating signal with initial value:: ', value)
 
-	local o = {
-		value = value,
-		publisher = Publisher:new(),
-	}
-
-	setmetatable(o, self)
-	self.__index = self
-
-	return o
+	self.value = value
+	self.publisher = Publisher:new()
 end
 
 --- Returns the signal value
@@ -36,7 +30,7 @@ end
 --- signal and vice versa
 --- @public
 --- @returns any signal value
-function M:read()
+function Signal:read()
 	log.debug('reading signal value', self:get_value())
 	local effect = Effect.context:pointer()
 
@@ -52,33 +46,33 @@ end
 --- Sets the signal value
 --- ON write, publisher will re-call all the effects registered for this signal
 --- @param value any value to set to signal
-function M:write(value)
+function Signal:write(value)
 	self:set_value(value)
 	self.publisher:dispatch()
 end
 
 --- Returns the current value
 --- @returns any
-function M:get_value()
+function Signal:get_value()
 	return self.value
 end
 
 --- Sets the current value
 --- @param value any
-function M:set_value(value)
+function Signal:set_value(value)
 	self.value = value
 end
 
 --- Add an effect to the signal
---- @param effect Effect effect
-function M:add_effect(effect)
+--- @param effect react.Effect effect
+function Signal:add_effect(effect)
 	self.publisher:add(effect)
 end
 
 --- Removes an effect registered in this signal
---- @param effect Effect
-function M:remove_effect(effect)
+--- @param effect react.Effect
+function Signal:remove_effect(effect)
 	self.publisher:remove_by_value(effect)
 end
 
-return M
+return Signal

@@ -1,3 +1,4 @@
+local class = require('react.util.class')
 local Stack = require('react.util.stack')
 local Set = require('react.util.set')
 local Event = require('react.util.event')
@@ -6,18 +7,19 @@ local EffectEvents = require('react.core.effect-events')
 local errors = require('react.core.effect-error-messages')
 local log = require('react.util.log')
 
---- @class Effect
+--- @class react.Effect
 --- @field private first_render boolean true until first render is completed
 --- @field private signals Set holds all the signals associated with this effect
 --- @field private signal_pointer number a signal can request previously created signals from the
 --- effect. When a signal is requested, the pointer will be incremented.
 --- @field private events Event event object to handle events within the effect
 --- @field private callback function to be called on an render/re-render event
-local M = {
-	context = Stack:new(),
-}
 
-function M:new(callback)
+local Effect = class()
+
+Effect.context = Stack:new()
+
+function Effect:_init(callback)
 	log.debug('creating new effect')
 
 	assert(
@@ -25,56 +27,54 @@ function M:new(callback)
 		'Callback function should be passed to effect'
 	)
 
-	local o = {}
-	setmetatable(o, self)
-	self.__index = self
+	-- local o = {}
+	-- setmetatable(o, self)
+	-- self.__index = self
 
 	local context_push_callback = function()
-		o.events:dispatch(EffectEvents.BEFORE_RENDER)
+		self.events:dispatch(EffectEvents.BEFORE_RENDER)
 
-		M.context:push(o)
+		Effect.context:push(self)
 
 		local ok, error_message = pcall(callback)
 
-		M.context:pop(o)
+		Effect.context:pop(self)
 
 		if not ok then
 			error(error_message)
 		end
 
-		o.events:dispatch(EffectEvents.AFTER_RENDER)
+		self.events:dispatch(EffectEvents.AFTER_RENDER)
 	end
 
-	o.first_render = true
-	o.signals = Set:new()
-	o.signal_pointer = 1
-	o.events = Event:new()
+	self.first_render = true
+	self.signals = Set:new()
+	self.signal_pointer = 1
+	self.events = Event:new()
 
 	-- wrap the callback only for the first render to identify the initial
 	-- render
 	---@diagnostic disable-next-line: duplicate-set-field
-	o.callback = function()
-		o.events:dispatch(EffectEvents.BEFORE_INIT_RENDER)
+	self.callback = function()
+		self.events:dispatch(EffectEvents.BEFORE_INIT_RENDER)
 		context_push_callback()
-		o.events:dispatch(EffectEvents.AFTER_INIT_RENDER)
+		self.events:dispatch(EffectEvents.AFTER_INIT_RENDER)
 
 		---@diagnostic disable-next-line: duplicate-set-field
-		o.callback = function()
-			o.events:dispatch(EffectEvents.BEFORE_RE_RENDER)
+		self.callback = function()
+			self.events:dispatch(EffectEvents.BEFORE_RE_RENDER)
 			context_push_callback()
-			o.events:dispatch(EffectEvents.AFTER_RE_RENDER)
+			self.events:dispatch(EffectEvents.AFTER_RE_RENDER)
 		end
 	end
 
-	o:register_default_ev_callbacks()
-
-	return o
+	self:register_default_ev_callbacks()
 end
 
 --- Returns true if the first render is not yet completed
 --- IF the current render is a re-render, false will be returned
 --- @returns boolean
-function M:is_first_render()
+function Effect:is_first_render()
 	return self.first_render
 end
 
@@ -96,7 +96,7 @@ end
 --- If you are not inside of an effect, then you can train an CV model to find
 --- the side of the coin flip and you can choose to create or to not create
 --- based on the coin flip. No one cares.
-function M:get_signal()
+function Effect:get_signal()
 	log.debug('returning existing signal for the pointer', self.signal_pointer)
 
 	if self:is_first_render() then
@@ -115,18 +115,18 @@ end
 
 --- Add a signal to this effect
 --- @param signal any signal to register
-function M:add_signal(signal)
+function Effect:add_signal(signal)
 	self.signals:add(signal)
 end
 
 --- Removes a signal
 --- @param signal any removes the given signal from the effect
-function M:remove_signal(signal)
+function Effect:remove_signal(signal)
 	self.signals:remove_by_value(signal)
 end
 
 --- Removes all signals from the effect and call remove_effect in the signal
-function M:unsubscribe_signals()
+function Effect:unsubscribe_signals()
 	for _, signal in self.signals:iter() do
 		signal:remove_effect(self)
 	end
@@ -135,13 +135,13 @@ function M:unsubscribe_signals()
 end
 
 --- Calls effect callback
-function M:dispatch()
+function Effect:dispatch()
 	self.callback()
 end
 
 --- Validates that the callback has NO hooks that request signals more or less than
 --- initial re-render
-function M:signal_retrieve_validation()
+function Effect:signal_retrieve_validation()
 	assert(
 		(self.signal_pointer - 1) == self.signals:length(),
 		errors.INVALID_SIGNAL_CREATION
@@ -149,7 +149,7 @@ function M:signal_retrieve_validation()
 end
 
 --- Register the default lifecycle events that belongs to Effects
-function M:register_default_ev_callbacks()
+function Effect:register_default_ev_callbacks()
 	self.events:add_listener(EffectEvents.BEFORE_RE_RENDER, function()
 		self.signal_pointer = 1
 	end)
@@ -163,4 +163,4 @@ function M:register_default_ev_callbacks()
 	--  end)
 end
 
-return M
+return Effect

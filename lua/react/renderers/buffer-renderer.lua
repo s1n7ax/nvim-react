@@ -1,36 +1,30 @@
+local class = require('react.util.class')
 local Component = require('react.components.buffer-component')
 
---- @class BufferRenderer
+--- @class react.BufferRenderer
 --- @field buffer number id of the buffer BufferRenderer should manage
-local M = {}
+local BufferRenderer = class()
 
-function M:new(o)
-	o = o or {
-		buffer = 0,
-	}
-
+function BufferRenderer:_init(args)
 	assert(
-		o.buffer,
+		args.buffer,
 		[[A buffer should be passed to the renderer
 		Ex:-
 
 		buffer = vim.api.nvim_create_buf(true, true)
 
-		Renderer:new({
+		Renderer({
 			buffer = buffer
 		})
 	]]
 	)
 
-	setmetatable(o, self)
-	self.__index = self
-
-	return o
+	self.buffer = args.buffer
 end
 
 --- Render the given root component
 --- @param root function root functional component to render
-function M:render(root)
+function BufferRenderer:render(root)
 	local function on_change(range, text)
 		vim.schedule(function()
 			vim.api.nvim_buf_set_text(
@@ -39,14 +33,14 @@ function M:render(root)
 				range.col_start,
 				range.row_end,
 				range.col_end,
-				M.__split_lines(text)
+				BufferRenderer.__split_lines(text)
 			)
 		end)
 	end
 
-	local rc = Component:new({ component = root, subscriber = on_change })
+	local rc = Component({ component = root, subscriber = on_change })
 
-	local lines = M.__split_lines(rc:get_text())
+	local lines = BufferRenderer.__split_lines(rc:get_text())
 
 	vim.api.nvim_buf_set_lines(self.buffer, 0, -1, true, lines)
 end
@@ -55,8 +49,8 @@ end
 --- Returns the split text by newlines
 --- @param text string text to split
 --- @returns string[]
-function M.__split_lines(text)
+function BufferRenderer.__split_lines(text)
 	return vim.split(text, '\n')
 end
 
-return M
+return BufferRenderer

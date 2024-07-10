@@ -1,20 +1,20 @@
+local class = require('react.util.class')
 local Set = require('react.util.set')
 local core = require('react.core')
 
 local create_effect = core.create_effect
---- @alias Range { row_start: number, col_start: number, row_end: number, col_end: number }
+--- @alias react.Range { row_start: number, col_start: number, row_end: number, col_end: number }
 
 --- @class BufferComponent
----
---- @field private effect Effect
+--- @field private effect react.Effect
 --- @field private node function
 --- @field private subscriber function
 --- @field private components Set
 --- @field private text string
 
-local M = {}
+local BufferComponent = class()
 
-function M:new(args)
+function BufferComponent:_init(args)
 	assert(
 		args.component,
 		[[A component should be passed
@@ -40,69 +40,62 @@ function M:new(args)
 	]]
 	)
 
-	local o = {
-		-- User's functional
-		node = args.component,
+	-- User's functional
+	self.node = args.component
 
-		-- Callback to get on change events
-		subscriber = args.subscriber,
+	-- Callback to get on change events
+	self.subscriber = args.subscriber
 
-		-- Effect object which will wrap the user's functional component
-		-- We are keeping this to release the memory when detaching the
-		-- component from it's parent
-		effect = nil,
+	-- Effect object which will wrap the user's functional component
+	-- We are keeping this to release the memory when detaching the
+	-- component from it's parent
+	self.effect = nil
 
-		-- List of components that will be referred when one of them are
-		-- user functional components and it's being updated
-		components = Set:new(),
+	-- List of components that will be referred when one of them are
+	-- user functional components and it's being updated
+	self.components = Set:new()
 
-		-- holds the latest text of this component
-		text = '',
-	}
-
-	setmetatable(o, self)
-	self.__index = self
+	-- holds the latest text of this component
+	self.text = ''
 
 	local init
 
 	-- Render the component for the first time without dispatching any changed
 	-- events
 	init = function()
-		o:__init_component()
+		self:__init_component()
 
 		init = function()
-			local prev_text = o:get_text()
+			local prev_text = self:get_text()
 
-			o:__init_component()
+			self:__init_component()
 
 			-- dispatches change event to parent
-			o:__dispatch_update(o.get_text_range(prev_text), o.text)
+			self:__dispatch_update(self.get_text_range(prev_text), self.text)
 		end
 	end
 
-	o.effect = create_effect(function()
+	self.effect = create_effect(function()
 		init()
 	end)
-
-	return o
 end
 
 --- Removes the component's effect from signals so set signals will not trigger a
 --- re-render and released from the memory
-function M:release_effect()
+function BufferComponent:release_effect()
 	self.effect:unsubscribe_signals()
 end
 
 --- Returns the text of the current component
 --- @returns string
-function M:get_text()
+function BufferComponent:get_text()
 	return self.text
 end
 
 --- Returns the range of text
 --- @param text string
 --- @returns Range
-function M.get_text_range(text)
+function BufferComponent.get_text_range(text)
 	local row_end = 0
 	local after_last_newline_idx = 0
 
@@ -122,8 +115,8 @@ end
 
 --- Calculates the given range (of a child) relative to the current component
 --- @param id number index of the child in the children list
---- @param child_range Range
-function M:get_relative_clild_range(id, child_range)
+--- @param child_range react.Range
+function BufferComponent:get_relative_clild_range(id, child_range)
 	local text = ''
 
 	for index = 1, (id - 1), 1 do
@@ -153,15 +146,15 @@ function M:get_relative_clild_range(id, child_range)
 end
 
 --- Remove the subscriber from the component
-function M:remove_subscriber()
+function BufferComponent:remove_subscriber()
 	self.subscriber = nil
 end
 
 --- @private
 --- Dispatch a re-render update to parent node
---- @param range Range range of the current component
+--- @param range react.Range range of the current component
 --- @param text string  text of the current component
-function M:__dispatch_update(range, text)
+function BufferComponent:__dispatch_update(range, text)
 	if self.subscriber then
 		self.subscriber(range, text)
 	end
@@ -172,7 +165,7 @@ end
 --- notifications back to this component.
 --- @param id number index of the child who is going to call this function on
 --- change
-function M:__get_notify_callback(id)
+function BufferComponent:__get_notify_callback(id)
 	local this = self
 
 	return function(range, text)
@@ -185,7 +178,7 @@ function M:__get_notify_callback(id)
 end
 
 --- Removes all subscriptions to children components and previous rendered text
-function M:__release_components()
+function BufferComponent:__release_components()
 	if self.components:length() < 1 then
 		return
 	end
@@ -201,7 +194,7 @@ function M:__release_components()
 	self.text = ''
 end
 
-function M:__init_component()
+function BufferComponent:__init_component()
 	-- remove prev subscriptions to children and text
 	self:__release_components()
 
@@ -211,7 +204,7 @@ function M:__init_component()
 		-- IF the current node is a function, then initialize component wrapper
 		-- around it and store the text
 		if type(node) == 'function' then
-			local component = M:new({
+			local component = BufferComponent({
 				component = node,
 				-- __get_notify_callback returns a callback that notify the
 				-- parent of the current component with the updated range
@@ -232,4 +225,4 @@ function M:__init_component()
 	end
 end
 
-return M
+return BufferComponent
