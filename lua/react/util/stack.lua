@@ -1,14 +1,11 @@
---- @class Stack
+local class = require('react.util.class')
+
+--- @class React.Stack
 --- @field private stack any[]
-local M = {}
+local M = class()
 
-function M:new()
-	local o = { stack = {} }
-
-	setmetatable(o, self)
-	self.__index = self
-
-	return o
+function M:_init()
+	self.stack = {}
 end
 
 --- Adds a new value to the stack

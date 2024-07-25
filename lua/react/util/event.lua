@@ -1,18 +1,12 @@
+local class = require('react.util.class')
 local Set = require('react.util.set')
 
 --- @class Event
---- @field private listeners_map table<string, Set>
-local M = {}
+--- @field private listeners_map table<string, react.Set>
+local M = class()
 
-function M:new()
-	local o = {
-		listeners_map = {},
-	}
-
-	setmetatable(o, self)
-	self.__index = self
-
-	return o
+function M:_init()
+	self.listeners_map = {}
 end
 
 --- Add a listener function to a given event
@@ -21,7 +15,7 @@ end
 --- @param opt nil|{once: boolean} additional options
 function M:add_listener(event, listener, opt)
 	if not self.listeners_map[event] then
-		self.listeners_map[event] = Set:new()
+		self.listeners_map[event] = Set()
 	end
 
 	if opt and not opt.once then

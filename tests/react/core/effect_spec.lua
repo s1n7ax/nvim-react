@@ -9,27 +9,27 @@ local create_signal = core.create_signal
 
 describe('effect::', function()
 	before_each(function()
-		Effect.context = Stack:new()
+		Effect.context = Stack()
 	end)
 
 	it('throws when callback function is not passed', function()
 		assert.has_error(function()
-			Effect:new('hello')
+			Effect('hello')
 		end)
 
 		assert.has_error(function()
-			Effect:new()
+			Effect()
 		end)
 
 		assert.error_matches(function()
-			Effect:new()
+			Effect()
 		end, 'Callback function should be passed to effect')
 	end)
 
 	it('callback runs on dispatch', function()
 		local count_render, get_count = counter()
 
-		local effect = Effect:new(function()
+		local effect = Effect(function()
 			count_render()
 		end)
 
@@ -41,16 +41,16 @@ describe('effect::', function()
 	it('adds effect/effects to the context in the correct order', function()
 		local effect_1, effect_2, effect_3
 
-		effect_1 = Effect:new(function()
+		effect_1 = Effect(function()
 			assert.same(1, #Effect.context.stack)
 			assert.same(effect_1, Effect.context.stack[1])
 
-			effect_2 = Effect:new(function()
+			effect_2 = Effect(function()
 				assert.same(2, #Effect.context.stack)
 				assert.same(effect_1, Effect.context.stack[1])
 				assert.same(effect_2, Effect.context.stack[2])
 
-				effect_3 = Effect:new(function()
+				effect_3 = Effect(function()
 					assert.same(3, #Effect.context.stack)
 					assert.same(effect_1, Effect.context.stack[1])
 					assert.same(effect_2, Effect.context.stack[2])
@@ -71,7 +71,7 @@ describe('effect::', function()
 		local effect
 		local expected_first_time = true
 
-		effect = Effect:new(function()
+		effect = Effect(function()
 			local _ = signal()
 			assert.equal(expected_first_time, effect.first_render)
 		end)
@@ -91,7 +91,7 @@ describe('effect::', function()
 
 		local expected_signal_pointer = 1
 
-		effect = Effect:new(function()
+		effect = Effect(function()
 			signal_1 = create_signal(0)
 			signal_2 = create_signal(0)
 
@@ -110,7 +110,7 @@ describe('effect::', function()
 	it('throws when requesting more signals than registered', function()
 		local count_render, get_count = counter()
 
-		local effect = Effect:new(function()
+		local effect = Effect(function()
 			local _ = create_signal(0)
 			local _ = create_signal(0)
 			local _ = create_signal(0)
@@ -135,7 +135,7 @@ describe('effect::', function()
 		local signal2 = create_signal(1)
 		local signal3 = create_signal(1)
 
-		local effect = Effect:new(function()
+		local effect = Effect(function()
 			signal1()
 			signal2()
 			signal3()
@@ -155,7 +155,7 @@ describe('effect::', function()
 			pcall(function()
 				assert.equal(true, Effect.context:is_empty())
 
-				Effect:new(function()
+				Effect(function()
 					error('throwing an error')
 				end):dispatch()
 			end)

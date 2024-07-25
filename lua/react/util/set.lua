@@ -1,12 +1,13 @@
+local class = require('react.util.class')
 local List = require('react.util.list')
 
---- @class Set: List
-local M = List:new()
+--- @class react.Set: react.List
+local Set = class(List)
 
 --- Append new value to the list only if it does not exist already
 --- @param value any value to append
 --- @returns boolean whether the value was added or not
-function M:add(value)
+function Set:add(value)
 	if self:has(value) then
 		return false
 	end
@@ -16,4 +17,4 @@ function M:add(value)
 	return true
 end
 
-return M
+return Set

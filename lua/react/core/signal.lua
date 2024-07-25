@@ -5,7 +5,7 @@ local log = require('react.util.log')
 
 --- @class react.Signal
 --- @field private value table value of the store
---- @field private publisher Publisher
+--- @field private publisher react.Publisher
 local Signal = class()
 
 function Signal:_init(value)
@@ -22,7 +22,7 @@ function Signal:_init(value)
 	log.debug('creating signal with initial value:: ', value)
 
 	self.value = value
-	self.publisher = Publisher:new()
+	self.publisher = Publisher()
 end
 
 --- Returns the signal value

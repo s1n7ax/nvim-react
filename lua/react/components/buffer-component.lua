@@ -9,7 +9,7 @@ local create_effect = core.create_effect
 --- @field private effect react.Effect
 --- @field private node function
 --- @field private subscriber function
---- @field private components Set
+--- @field private components react.Set
 --- @field private text string
 
 local BufferComponent = class()
@@ -33,7 +33,7 @@ function BufferComponent:_init(args)
 
 		local Component = require('react.component')
 
-		Component:new({
+		Component({
 			component = App,
 			subscriber = on_change
 		})
@@ -53,7 +53,7 @@ function BufferComponent:_init(args)
 
 	-- List of components that will be referred when one of them are
 	-- user functional components and it's being updated
-	self.components = Set:new()
+	self.components = Set()
 
 	-- holds the latest text of this component
 	self.text = ''

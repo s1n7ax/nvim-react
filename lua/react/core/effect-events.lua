@@ -1,4 +1,4 @@
---- @enum EffectEvents
+--- @enum react.EffectEvents
 return {
 
 	-- runs before / after each render

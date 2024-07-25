@@ -11,17 +11,17 @@ describe('store::', function()
 		local get_init_pub_map = function()
 			return {
 				key = 'root',
-				effects = Set:new(),
+				effects = Set(),
 				children = {
 					a = {
 						key = 'a',
-						effects = Set:new(),
+						effects = Set(),
 						children = {
 							b = {
 								key = 'b',
-								effects = Set:new(),
+								effects = Set(),
 								children = {
-									c = { key = 'c', effects = Set:new(), children = {} },
+									c = { key = 'c', effects = Set(), children = {} },
 								},
 							},
 						},
@@ -41,30 +41,30 @@ describe('store::', function()
 			it('traversal returns the correct node for given path', function()
 				assert.equal(
 					pub_map.children.a,
-					helper.publisher_path_traversal(pub_map, List:new({ 'a' }))
+					helper.publisher_path_traversal(pub_map, List({ 'a' }))
 				)
 
 				assert.equal(
 					pub_map.children.a.children.b,
-					helper.publisher_path_traversal(pub_map, List:new({ 'a', 'b' }))
+					helper.publisher_path_traversal(pub_map, List({ 'a', 'b' }))
 				)
 
 				assert.not_equal(
 					pub_map.children.a.children.b,
-					helper.publisher_path_traversal(pub_map, List:new({ 'b' })).key
+					helper.publisher_path_traversal(pub_map, List({ 'b' })).key
 				)
 			end)
 
 			it('traversal creates the publishers map', function()
 				pub_map = {
 					key = 'root',
-					effects = Set:new(),
+					effects = Set(),
 					children = {},
 				}
 
 				local curr_pub_node = pub_map
 
-				helper.publisher_path_traversal(pub_map, List:new({ 'a', 'b', 'c' }))
+				helper.publisher_path_traversal(pub_map, List({ 'a', 'b', 'c' }))
 
 				for _, key in ipairs({ 'a', 'b', 'c' }) do
 					assert.same(
@@ -79,14 +79,14 @@ describe('store::', function()
 			end)
 
 			it('current path appends key to parent path', function()
-				local parent_path = List:new({ 'a', 'b', 'c' })
+				local parent_path = List({ 'a', 'b', 'c' })
 
 				assert.same(
-					List:new({ 'a', 'b', 'c', 'd' }),
+					List({ 'a', 'b', 'c', 'd' }),
 					helper.get_curr_path_by_key(parent_path, 'd')
 				)
 				assert.not_equal(
-					List:new({ 'a', 'b', 'c', 'd' }),
+					List({ 'a', 'b', 'c', 'd' }),
 					helper.get_curr_path_by_key(parent_path, 'd')
 				)
 			end)
@@ -123,7 +123,7 @@ describe('store::', function()
 					local effect_values = { 0, 0, 0 }
 
 					for i = 1, 3 do
-						effects[i] = Effect:new(function()
+						effects[i] = Effect(function()
 							effect_values[i] = effect_values[i] + 1
 						end)
 					end
@@ -163,7 +163,7 @@ describe('store::', function()
 						local effect_values = { 0, 0, 0 }
 
 						for i = 1, 3 do
-							effects[i] = Effect:new(function()
+							effects[i] = Effect(function()
 								effect_values[i] = effect_values[i] + 1
 							end)
 						end

@@ -1,19 +1,13 @@
+local class = require('react.util.class')
 local Set = require('react.util.set')
 local Publisher = require('react.util.publisher')
 local Effect = require('react.core.effect')
 
-local M = {
-	list = Set:new(),
-	element_publishers = Set:new(),
-	publisher = Publisher:new(),
-}
+local M = class()
 
-function M:new(o)
-	o = o or {}
-	setmetatable(o, self)
-	self.__index = self
-	return o
-end
+M.list = Set()
+M.element_publishers = Set()
+M.publisher = Publisher()
 
 function M:get(index)
 	self:reg_subscriber()

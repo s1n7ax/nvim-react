@@ -8,7 +8,7 @@ return function(init_value)
 	assert(Effect.context:is_empty(), 'Store can not be created inside an effect or component')
 
 	local publishers = {
-		effects = Set:new(),
+		effects = Set(),
 		children = {},
 	}
 

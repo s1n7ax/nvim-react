@@ -5,7 +5,7 @@ local M = {}
 
 --- Traverse through the table and find
 --- @param publisher_map PublisherMap
---- @param path List
+--- @param path react.List
 function M.publisher_path_traversal(publisher_map, path)
 	local curr_pub_node = publisher_map
 
@@ -14,7 +14,7 @@ function M.publisher_path_traversal(publisher_map, path)
 			curr_pub_node.children[key] = {
 				-- adding key for debugging purposes
 				key = key,
-				effects = Set:new(),
+				effects = Set(),
 				children = {},
 			}
 		end
@@ -48,7 +48,7 @@ function M.dispatch_and_remove_children(root_pub_node)
 end
 
 function M.get_all_effects_in_pub_node(root_pub_node)
-	local effects = Set:new()
+	local effects = Set()
 
 	local capture_children_effects = nil
 

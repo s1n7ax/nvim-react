@@ -9,7 +9,7 @@ local log = require('react.util.log')
 
 --- @class react.Effect
 --- @field private first_render boolean true until first render is completed
---- @field private signals Set holds all the signals associated with this effect
+--- @field private signals react.Set holds all the signals associated with this effect
 --- @field private signal_pointer number a signal can request previously created signals from the
 --- effect. When a signal is requested, the pointer will be incremented.
 --- @field private events Event event object to handle events within the effect
@@ -17,7 +17,7 @@ local log = require('react.util.log')
 
 local Effect = class()
 
-Effect.context = Stack:new()
+Effect.context = Stack()
 
 function Effect:_init(callback)
 	log.debug('creating new effect')
@@ -26,10 +26,6 @@ function Effect:_init(callback)
 		callback and type(callback) == 'function',
 		'Callback function should be passed to effect'
 	)
-
-	-- local o = {}
-	-- setmetatable(o, self)
-	-- self.__index = self
 
 	local context_push_callback = function()
 		self.events:dispatch(EffectEvents.BEFORE_RENDER)
@@ -48,9 +44,9 @@ function Effect:_init(callback)
 	end
 
 	self.first_render = true
-	self.signals = Set:new()
+	self.signals = Set()
 	self.signal_pointer = 1
-	self.events = Event:new()
+	self.events = Event()
 
 	-- wrap the callback only for the first render to identify the initial
 	-- render

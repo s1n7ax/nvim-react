@@ -1,14 +1,17 @@
+local class = require('react.util.class')
 local Effect = require('react.core.effect')
 local List = require('react.util.list')
 local helper = require('react.stores.dict.helper')
 local log = require('react.util.log')
 
---- @alias PublisherMap { key: string, effects: Set, children: PublisherMap[] }
---- @alias DictNodeConstructor { publishers: PublisherMap, value: any, path?: List, curr_publisher_node?: PublisherMap }
+--- @alias PublisherMap { key: string, effects: react.Set, children: PublisherMap[] }
+--- @alias DictNodeConstructor { publishers: PublisherMap, value: any, path?: react.List, curr_publisher_node?: PublisherMap }
 
 --- @class DictNode
 --- @field value any value of the dict node
-local M = {}
+local M = class()
+
+function M:_init() end
 
 --- @param opt DictNodeConstructor
 function M:new(opt)
@@ -20,7 +23,7 @@ function M:new(opt)
 	local obj = setmetatable({}, {
 		publishers = opt.publishers,
 		value = opt.value,
-		path = opt.path or List:new(),
+		path = opt.path or List(),
 		curr_publishers_node = opt.curr_publisher_node or opt.publishers,
 
 		__index = self.index,
@@ -41,7 +44,6 @@ function M.index(self, key)
 	local curr_path = helper.get_curr_path_by_key(parent_path, key)
 	local curr_pub_node = helper.publisher_path_traversal(publishers, curr_path)
 	local indexed_value = value[key]
-
 
 	log.debug(('indexed value for key "%s" is'):format(key), indexed_value)
 
@@ -67,7 +69,12 @@ function M.index(self, key)
 
 	-- if the next value is a table then create new object of dict
 	if type(indexed_value) == 'table' then
-		log.debug('creating new dict node for path ', curr_path.list, ' with value', indexed_value)
+		log.debug(
+			'creating new dict node for path ',
+			curr_path.list,
+			' with value',
+			indexed_value
+		)
 
 		return M:new({
 			publishers = publishers,

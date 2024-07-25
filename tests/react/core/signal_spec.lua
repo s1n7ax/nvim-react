@@ -5,21 +5,21 @@ local counter = require('util.counter')
 
 describe('signal::', function()
 	it('correctly sets initial value', function()
-		local num = Signal:new(10)
+		local num = Signal(10)
 		assert.equal(10, num:read())
 
-		local str = Signal:new('hello world')
+		local str = Signal('hello world')
 		assert.equal('hello world', str:read())
 
-		local bool = Signal:new(true)
+		local bool = Signal(true)
 		assert.equal(true, bool:read())
 
-		local tbl = Signal:new({ name = 's1n7ax' })
+		local tbl = Signal({ name = 's1n7ax' })
 		assert.same({ name = 's1n7ax' }, tbl:read())
 	end)
 
 	it('correctly changes the existing value', function()
-		local signal = Signal:new(10)
+		local signal = Signal(10)
 		assert.same(10, signal:read())
 
 		signal:write('hello world')
@@ -33,13 +33,13 @@ describe('signal::', function()
 	end)
 
 	it('can be initialized outside effect', function()
-		local signal = Signal:new(10)
+		local signal = Signal(10)
 		assert.equal(10, signal:read())
 	end)
 
 	it('can be initialized inside effect', function()
-		local effect = Effect:new(function()
-			local signal = Signal:new(10)
+		local effect = Effect(function()
+			local signal = Signal(10)
 			assert(10, signal:read())
 		end)
 
@@ -47,16 +47,16 @@ describe('signal::', function()
 	end)
 
 	it('does not register effect on read outside effect', function()
-		local signal = Signal:new(10)
+		local signal = Signal(10)
 		signal:read()
 		assert.equal(0, signal.publisher:length())
 	end)
 
 	it('register effect on read inside effect', function()
-		Effect:new(function()
-			local signal_1 = Signal:new(10)
-			local signal_2 = Signal:new(10)
-			local signal_3 = Signal:new(10)
+		Effect(function()
+			local signal_1 = Signal(10)
+			local signal_2 = Signal(10)
+			local signal_3 = Signal(10)
 
 			signal_1:read()
 			signal_2:read()
@@ -66,10 +66,10 @@ describe('signal::', function()
 			assert.equal(0, signal_3.publisher:length())
 		end):dispatch()
 
-		local signal_1 = Signal:new(10)
-		local signal_2 = Signal:new(10)
-		local signal_3 = Signal:new(10)
-		Effect:new(function()
+		local signal_1 = Signal(10)
+		local signal_2 = Signal(10)
+		local signal_3 = Signal(10)
+		Effect(function()
 			signal_1:read()
 			signal_2:read()
 
@@ -82,8 +82,8 @@ describe('signal::', function()
 	it(
 		'effect is registered only once when same signal is used multiple times',
 		function()
-			Effect:new(function()
-				local signal = Signal:new(10)
+			Effect(function()
+				local signal = Signal(10)
 
 				signal:read()
 				signal:read()
@@ -92,8 +92,8 @@ describe('signal::', function()
 				assert.equal(1, signal.publisher:length())
 			end):dispatch()
 
-			local signal = Signal:new(10)
-			Effect:new(function()
+			local signal = Signal(10)
+			Effect(function()
 				signal:read()
 				signal:read()
 				signal:read()
@@ -104,9 +104,9 @@ describe('signal::', function()
 
 	it('re-render the effect on write', function()
 		local count, get_count = counter()
-		local signal = Signal:new(10)
+		local signal = Signal(10)
 
-		Effect:new(function()
+		Effect(function()
 			signal:read()
 			count()
 		end):dispatch()
@@ -118,10 +118,10 @@ describe('signal::', function()
 	end)
 
 	it('signal change is available in effect', function()
-		local signal = Signal:new(10)
+		local signal = Signal(10)
 		local current_value = nil
 
-		Effect:new(function()
+		Effect(function()
 			current_value = signal:read()
 		end):dispatch()
 
@@ -140,8 +140,8 @@ describe('signal::', function()
 	it('does not re-render when not used', function()
 		local signal
 
-		Effect:new(function()
-			signal = Signal:new(10)
+		Effect(function()
+			signal = Signal(10)
 		end):dispatch()
 
 		assert.equal(0, signal.publisher:length())
@@ -150,10 +150,10 @@ describe('signal::', function()
 	it('signal returns the initially created signal on re-render', function()
 		local signal_1, signal_2, signal_3
 
-		Effect:new(function()
-			signal_1 = Signal:new(10)
-			signal_2 = Signal:new(20)
-			signal_3 = Signal:new(30)
+		Effect(function()
+			signal_1 = Signal(10)
+			signal_2 = Signal(20)
+			signal_3 = Signal(30)
 		end):dispatch()
 
 		assert.same(10, signal_1:get_value())
@@ -170,11 +170,11 @@ describe('signal::', function()
 	end)
 
 	it('after unsubscribe, effect should be removed from signal', function()
-		local signal_1 = Signal:new(10)
-		local signal_2 = Signal:new(10)
+		local signal_1 = Signal(10)
+		local signal_2 = Signal(10)
 		local render_count = 0
 
-		local effect = Effect:new(function()
+		local effect = Effect(function()
 			signal_1:read()
 			signal_2:read()
 
@@ -198,10 +198,10 @@ describe('signal::', function()
 	end)
 
 	it('adds signal to the effect on use', function()
-		local signal1 = Signal:new(10)
-		local signal2 = Signal:new(10)
+		local signal1 = Signal(10)
+		local signal2 = Signal(10)
 
-		local effect = Effect:new(function()
+		local effect = Effect(function()
 			signal1:read()
 			signal2:read()
 		end)
